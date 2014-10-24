@@ -99,6 +99,17 @@ module RocketPants
       ActiveSupport::JSON.encode object
     end
 
+    def encode_to_xml(object, options)
+      object.to_xml(options.slice(:root))
+    end
+
+    def render_to_proper_format(output, options)
+      case request.accept
+      when /\/xml/ then render_xml(output, options)
+      else              render_json(output, options) # Unrecognized formats default to JSON.
+      end
+    end
+
     # Given a json object or encoded json, will encode it
     # and set it to be the output of the given page.
     def render_json(json, options = {})
@@ -115,17 +126,26 @@ module RocketPants
       headers['Content-Length'] = Rack::Utils.bytesize(json).to_s
     end
 
+    def render_xml(xml, options = {})
+      self.status        = options[:status]       || :ok
+      self.content_type  = options[:content_type] || Mime::XML
+
+      xml = encode_to_xml(xml, options) unless xml.respond_to?(:to_str)
+      self.response_body = xml
+      headers['Content-Length'] = Rack::Utils.bytesize(xml).to_s
+    end
+
     # Renders a raw object, without any wrapping etc.
     # Suitable for nicer object handling.
     def responds(object, options = {})
-      render_json normalise_object(object, options), options
+      render_to_proper_format normalise_object(object, options), options
     end
 
     def respond_with_object_and_type(object, options, type, singular)
       pre_process_exposed_object object, type, singular
       options = options.reverse_merge(:compact => true) unless singular
       meta = expose_metadata metadata_for(object, options, type, singular)
-      render_json({:response => normalise_object(object, options)}.merge(meta), options)
+      render_to_proper_format({:response => normalise_object(object, options)}.merge(meta), options)
       post_process_exposed_object object, type, singular
     end
 
