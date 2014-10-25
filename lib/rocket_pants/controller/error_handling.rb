@@ -124,10 +124,15 @@ module RocketPants
         end
       end
       self.status = lookup_error_status(exception)
-      render_json({
+      error_hash = {
         :error             => lookup_error_name(exception).to_s,
         :error_description => lookup_error_message(exception)
-      }.merge(lookup_error_metadata(exception)))
+      }.merge(lookup_error_metadata(exception))
+
+      case request.accept
+      when /\/xml/ then render_xml(error_hash, root: "errors")
+      else              render_json(error_hash)
+      end
     end
 
   end

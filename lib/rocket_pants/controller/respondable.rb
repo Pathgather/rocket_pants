@@ -127,11 +127,13 @@ module RocketPants
     end
 
     def render_xml(xml, options = {})
-      self.status        = options[:status]       || :ok
-      self.content_type  = options[:content_type] || Mime::XML
+      self.status        = options[:status] if options[:status]
+      self.content_type  = options[:content_type] if options[:content_type]
 
       xml = encode_to_xml(xml, options) unless xml.respond_to?(:to_str)
-      self.response_body = xml
+      self.status        ||= :ok
+      self.content_type  ||= Mime::XML
+      self.response_body   = xml
       headers['Content-Length'] = Rack::Utils.bytesize(xml).to_s
     end
 
