@@ -10,7 +10,7 @@ module RocketPants
     module ClassMethods
 
       def version(version)
-        version = version..version if version.is_a?(Integer)
+        version = version..version if version.is_a?(Integer) || version.is_a?(Float)
         self._version_range = version
         before_filter :verify_api_version
       end
@@ -23,7 +23,7 @@ module RocketPants
       if !instance_variable_defined?(:@version)
         @version = begin
           version = extract_version_string_with_prefix params[:version], request.symbolized_path_parameters[:rp_prefix]
-          version.presence && Integer(version)
+          version.presence && ((version.to_s =~ /\A\d+\Z/ && Integer(version)) || (version.to_s =~ /\A\d+\.\d+\Z/ && Float(version)))
         rescue ArgumentError
           nil
         end

@@ -88,7 +88,7 @@ describe RocketPants::Base do
     end
 
     it 'should return an error for an invalid version number' do
-      [0, 3, 10, 2.5, 2.2, '1.1'].each do |version|
+      [0, 3, 10, 2.5, 2.2, '2.1'].each do |version|
         get :echo, {}, :version => version.to_s
         content[:error].should == 'invalid_version'
       end

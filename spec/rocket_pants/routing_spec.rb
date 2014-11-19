@@ -101,7 +101,6 @@ describe RocketPants::Routing do
 
   it 'should not let you draw a route with an invalid version' do
     expect_options(:version => '  ').to raise_error(ArgumentError)
-    expect_options(:version => '1.1').to raise_error(ArgumentError)
     expect_options(:version => 'test-version').to raise_error(ArgumentError)
     expect_options(:version => 'v1').to raise_error(ArgumentError)
   end

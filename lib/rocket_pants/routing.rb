@@ -33,10 +33,15 @@ module RocketPants
 
     def extract_rocket_pants_versions(options)
       versions = (Array(options.delete(:versions)) + Array(options.delete(:version))).flatten.map(&:to_s)
+      new_versions = []
       versions.each do |version|
-        raise ArgumentError, "Got invalid version: '#{version}'" unless version =~ /\A\d+\Z/
+        if version =~ /\A\d+(\.\d+)?\Z/
+          version =~ /\A\d+\.0\Z/ ? new_versions.push(version, version.to_i) : new_versions.push(version)
+        else
+          raise ArgumentError, "Got invalid version: '#{version}'"
+        end
       end
-      versions
+      new_versions
     end
 
   end
