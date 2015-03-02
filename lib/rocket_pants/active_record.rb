@@ -7,9 +7,6 @@ module RocketPants
       map_error! ActiveRecord::RecordNotFound, RocketPants::NotFound
       map_error! ActiveRecord::RecordNotUnique, RocketPants::Conflict
       map_error!(ActiveRecord::RecordNotSaved) { RocketPants::InvalidResource.new nil }
-      map_error! ActiveRecord::RecordInvalid do |exception|
-        RocketPants::InvalidResource.new exception.record.errors
-      end
     end
 
     ActiveSupport.on_load :active_record do
